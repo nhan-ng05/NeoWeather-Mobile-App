@@ -8,6 +8,7 @@ class SearchBox extends StatelessWidget {
   final InputDecoration? decoration;
   final TextAlign textAlign;
   final bool obscureText;
+  final void Function(String)? onSubmitted;
   const SearchBox({
     super.key,
     required this.controller,
@@ -17,6 +18,7 @@ class SearchBox extends StatelessWidget {
     required this.decoration,
     required this.textAlign,
     required this.obscureText,
+    required this.onSubmitted,
   });
 
   @override
@@ -29,6 +31,7 @@ class SearchBox extends StatelessWidget {
       readOnly: readOnly,
       decoration: decoration,
       obscureText: obscureText,
+      onSubmitted: onSubmitted,
     );
   }
 }
