@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   final LocationService locationService = LocationService();
   late String? currentPosition;
   final WeatherService weatherService = WeatherService();
+  List forecast = [];
   WeatherModel weatherModel = WeatherModel(
     city: null,
     country: null,
@@ -44,6 +45,12 @@ class _HomePageState extends State<HomePage> {
       widget.position.longitude,
     );
 
+    // get weather forecast
+    forecast = await weatherService.getForecast(
+      widget.position.latitude,
+      widget.position.longitude,
+    );
+
     // get position
     try {
       WeatherModel loadWeatherModel = await weatherService.getWeatherByPosition(
@@ -60,6 +67,8 @@ class _HomePageState extends State<HomePage> {
           );
         }
       }
+
+      // reload state
       setState(() {
         weatherModel = loadWeatherModel;
       });
@@ -343,6 +352,60 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                  ),
+
+                  // title
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30, left: 20),
+                    child: Text(
+                      "Dự báo thời tiết",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // forecast list
+                  Padding(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    child: SizedBox(
+                      height: 200,
+                      // width: 300,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: forecast.length,
+                        itemBuilder: (context, index) {
+                          final WeatherModel item = forecast[index];
+
+                          return Container(
+                            width: 140,
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(item.dateTime ?? "--"),
+                                Image.asset(
+                                  getIconUrl(item.icon ?? ""),
+                                  height: 40,
+                                ),
+                                Text("${item.temperature ?? "--"}°"),
+                                const SizedBox(height: 8),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

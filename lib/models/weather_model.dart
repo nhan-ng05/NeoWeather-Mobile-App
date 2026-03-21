@@ -24,9 +24,12 @@ class WeatherModel {
   });
 
   // convert json
-  factory WeatherModel.fromJson(Map<String, dynamic> json) {
+  factory WeatherModel.fromJson(
+    Map<String, dynamic> json, {
+    bool isForecast = false,
+    int timezone = 0,
+  }) {
     int dt = json['dt'] ?? 0;
-    int timezone = json['timezone'] ?? 0;
 
     DateTime cityTime = DateTime.fromMillisecondsSinceEpoch(
       (dt + timezone) * 1000,
@@ -34,20 +37,49 @@ class WeatherModel {
     );
 
     String formattedDate = DateFormat(
-      'EEEE, d MMMM, yyyy',
+      isForecast ? 'HH:mm, d/M, yyyy' : 'EEEE, d MMMM, yyyy',
       'vi_VN',
     ).format(cityTime);
 
     return WeatherModel(
-      city: json["name"],
-      country: json["sys"]["country"],
+      city: isForecast ? null : json["name"],
+      country: isForecast ? null : json["sys"]?["country"],
       temperature: json["main"]["temp"].toDouble().round().toString(),
       description: json["weather"][0]["description"],
       humidity: json["main"]["humidity"].toString(),
       windSpeed: json["wind"]["speed"].toString(),
       icon: json["weather"][0]["icon"],
-      feelsLike: json["main"]["feels_like"]?.toString(),
+      feelsLike: json["main"]["feels_like"]?.toDouble().round().toString(),
       dateTime: formattedDate,
     );
   }
+  // factory WeatherModel.fromJson(
+  //   Map<String, dynamic> json, {
+  //   bool isForecast = false,
+  // }) {
+  //   int dt = json['dt'] ?? 0;
+  //   int timezone = json['timezone'] ?? 0;
+
+  //   DateTime cityTime = DateTime.fromMillisecondsSinceEpoch(
+  //     (dt + timezone) * 1000,
+  //     isUtc: true,
+  //   );
+
+  //   String formattedDate = DateFormat(
+  //     'EEEE, d MMMM, yyyy',
+  //     'vi_VN',
+  //   ).format(cityTime);
+
+  //   return WeatherModel(
+  //     city: isForecast ? null : json["name"],
+  //     country: isForecast ? null : json["sys"]?["country"],
+  //     temperature: json["main"]["temp"].toDouble().round().toString(),
+  //     description: json["weather"][0]["description"],
+  //     humidity: json["main"]["humidity"].toString(),
+  //     windSpeed: json["wind"]["speed"].toString(),
+  //     icon: json["weather"][0]["icon"],
+  //     feelsLike: json["main"]["feels_like"]?.toDouble().round().toString(),
+  //     dateTime: formattedDate,
+  //   );
+  // }
 }

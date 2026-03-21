@@ -84,4 +84,28 @@ class WeatherService {
     }
     return null;
   }
+
+  // weather forecast
+  Future<List<WeatherModel>> getForecast(double lat, double lon) async {
+    final url =
+        "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=vi";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      // final List list = data["list"];
+
+      // return list forecast
+      int timezone = data["city"]["timezone"];
+      return (data['list'] as List)
+          .map(
+            (e) =>
+                WeatherModel.fromJson(e, isForecast: true, timezone: timezone),
+          )
+          .toList();
+    } else {
+      throw Exception("Không lấy được dự báo thời tiết");
+    }
+  }
 }
