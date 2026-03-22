@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:weather_app/animations/weather_animated_icon.dart';
 import 'package:weather_app/components/search_box.dart';
 import 'package:weather_app/models/weather_model.dart';
 import 'package:weather_app/services/location_service.dart';
@@ -87,19 +88,19 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  String getIconUrl(String icon) {
-    String url = "assets/$icon.gif";
-    switch (icon) {
-      case "04n":
-        return "assets/04d.gif";
-      case "03n":
-        return "assets/03d.gif";
-      case "13n":
-        return "assets/13d.gif";
-    }
-    print("Chưa có icon mã: $icon");
-    return url;
-  }
+  // String getIconUrl(String icon) {
+  //   String url = "assets/$icon.gif";
+  //   switch (icon) {
+  //     case "04n":
+  //       return "assets/04d.gif";
+  //     case "03n":
+  //       return "assets/03d.gif";
+  //     case "13n":
+  //       return "assets/13d.gif";
+  //   }
+  //   print("Chưa có icon mã: $icon");
+  //   return url;
+  // }
 
   Future<void> findCity(String? city) async {
     if (city == null) return;
@@ -124,8 +125,13 @@ class _HomePageState extends State<HomePage> {
           searchPosition.latitude,
           searchPosition.longitude,
         );
+        forecast = await weatherService.getForecast(
+          searchPosition.latitude,
+          searchPosition.longitude,
+        );
       } else {
         currentPosition = null;
+        forecast = [];
       }
       setState(() {
         weatherModel = loadWeatherModel;
@@ -148,9 +154,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         toolbarHeight: 100,
         title: SearchBox(
@@ -241,10 +249,17 @@ class _HomePageState extends State<HomePage> {
                           )
                         : SizedBox(
                             height: 400,
-                            child: Image.asset(
-                              getIconUrl(weatherModel.icon!),
-                              height: 200,
+                            child: Center(
+                              child: WeatherAnimatedIcon(
+                                iconCode: weatherModel.icon!,
+                                size: 300,
+                              ),
                             ),
+
+                            // child: Image.asset(
+                            //   getIconUrl(weatherModel.icon!),
+                            //   height: 200,
+                            // ),
                           ),
                   ),
 
@@ -302,7 +317,12 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Icon(WeatherIcons.rain, size: 25),
                                   const SizedBox(height: 6),
-                                  Text("${weatherModel.humidity ?? "--"} %"),
+                                  Text(
+                                    "${weatherModel.humidity ?? "--"} %",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   Text(
                                     "Độ Ẩm",
                                     style: TextStyle(
@@ -321,7 +341,12 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Icon(WeatherIcons.cloudy_windy, size: 25),
                                   const SizedBox(height: 6),
-                                  Text("${weatherModel.windSpeed ?? "--"} m/s"),
+                                  Text(
+                                    "${weatherModel.windSpeed ?? "--"} m/s",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   Text(
                                     "Tốc Độ Gió",
                                     style: TextStyle(
@@ -340,7 +365,12 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Icon(WeatherIcons.thermometer, size: 25),
                                   const SizedBox(height: 6),
-                                  Text("${weatherModel.feelsLike ?? "--"} °C"),
+                                  Text(
+                                    "${weatherModel.feelsLike ?? "--"} °C",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   Text(
                                     "Cảm Thấy Như",
                                     style: TextStyle(
@@ -375,38 +405,60 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: EdgeInsets.only(left: 20, right: 20),
                     child: SizedBox(
-                      height: 200,
+                      height: 170,
                       // width: 300,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: forecast.length,
-                        itemBuilder: (context, index) {
-                          final WeatherModel item = forecast[index];
-
-                          return Container(
-                            width: 140,
-                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade100,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(item.dateTime ?? "--"),
-                                Image.asset(
-                                  getIconUrl(item.icon ?? ""),
-                                  height: 40,
+                      child: forecast.isEmpty
+                          ? Center(
+                              child: SizedBox(
+                                height: 100,
+                                width: 100,
+                                child: CircularProgressIndicator(
+                                  color: Colors.black,
                                 ),
-                                Text("${item.temperature ?? "--"}°"),
-                                const SizedBox(height: 8),
-                                const SizedBox(height: 8),
-                              ],
+                              ),
+                            )
+                          : ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: forecast.length,
+                              itemBuilder: (context, index) {
+                                final WeatherModel item = forecast[index];
+
+                                return Container(
+                                  width: 140,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade100,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(item.dateTime ?? "--"),
+
+                                      // Image.asset(
+                                      //   getIconUrl(item.icon ?? ""),
+                                      //   height: 40,
+                                      // ),
+                                      WeatherAnimatedIcon(
+                                        iconCode: item.icon!,
+                                        size: 70,
+                                      ),
+                                      Text(
+                                        "${item.temperature ?? "--"} °C",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
                     ),
                   ),
                 ],
