@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:weather_app/animations/weather_animated_icon.dart';
 import 'package:weather_app/components/search_box.dart';
 import 'package:weather_app/models/weather_model.dart';
@@ -8,14 +11,16 @@ import 'package:weather_app/services/weather_service.dart';
 import 'package:weather_icons/weather_icons.dart';
 
 class HomePage extends StatefulWidget {
-  final Position position;
-  const HomePage({super.key, required this.position});
+  // final Position position;
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late Position position;
+  Widget exceptionMessage = Text("");
   bool isLoading = true;
   final LocationService locationService = LocationService();
   late String? currentPosition;
@@ -36,26 +41,32 @@ class _HomePageState extends State<HomePage> {
   final FocusNode searchFocusNode = FocusNode();
 
   Future<void> _loadData() async {
+    // trigger animation
     setState(() {
       isLoading = true;
+      exceptionMessage = handlingException(1);
     });
 
-    // get administration && ministration
-    currentPosition = await locationService.getDistrictName(
-      widget.position.latitude,
-      widget.position.longitude,
-    );
-
-    // get weather forecast
-    forecast = await weatherService.getForecast(
-      widget.position.latitude,
-      widget.position.longitude,
-    );
-
-    // get position
     try {
+      // get position
+      position = await locationService.getCurrentLocation();
+      await initializeDateFormatting('vi_VN', null);
+
+      // get administration && ministration
+      currentPosition = await locationService.getDistrictName(
+        position.latitude,
+        position.longitude,
+      );
+
+      // get weather forecast
+      forecast = await weatherService.getForecast(
+        position.latitude,
+        position.longitude,
+      );
+
+      // get position
       WeatherModel loadWeatherModel = await weatherService.getWeatherByPosition(
-        widget.position,
+        position,
       );
       if (mounted) {
         if (loadWeatherModel.city == null) {
@@ -73,8 +84,21 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         weatherModel = loadWeatherModel;
       });
+    } on SocketException catch (e) {
+      setState(() {
+        exceptionMessage = handlingException(2, text: "$e");
+      });
+      return;
+    } on HttpException catch (e) {
+      setState(() {
+        exceptionMessage = handlingException(2, text: "$e");
+      });
+      return;
     } catch (e) {
-      print("Lỗi: $e");
+      setState(() {
+        exceptionMessage = handlingException(2, text: "$e");
+      });
+      return;
     }
 
     setState(() {
@@ -141,7 +165,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // upper case in every first word letter
   String capitalize(String word) {
     if (word.isEmpty) return word;
     return word[0].toUpperCase() + word.substring(1);
@@ -151,11 +174,67 @@ class _HomePageState extends State<HomePage> {
     return sentence.split(' ').map((word) => capitalize(word)).join(' ');
   }
 
+  Widget handlingException(int type, {String text = ""}) {
+    if (type == 1) {
+      return SizedBox(
+        width: 150,
+        height: 150,
+        child: CircularProgressIndicator(color: Colors.black),
+      );
+    }
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 100,
+          child: Icon(
+            Icons.wifi_rounded,
+            color: Colors.grey.shade500,
+            size: 70.0,
+          ),
+        ),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.grey.shade500,
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
+      drawer: Drawer(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // white space
+              Container(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top,
+                ),
+              ),
+
+              ListTile(
+                leading: Icon(Icons.home),
+                title: Text(
+                  "Home",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
@@ -187,7 +266,16 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? RefreshIndicator(
+              onRefresh: _loadData,
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(child: exceptionMessage),
+                ),
+              ),
+            )
           : RefreshIndicator(
               onRefresh: _loadData,
               child: ListView(

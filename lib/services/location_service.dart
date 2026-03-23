@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -28,23 +30,28 @@ class LocationService {
     }
 
     // get current position
-    return await Geolocator.getCurrentPosition();
+    try {
+      return await Geolocator.getCurrentPosition();
+    } catch (e) {
+      return Future.error("Không thể lấy vị trí,vui lòng kết nối mạng");
+    }
   }
 
   Future<String?> getDistrictName(double lat, double lon) async {
     await setLocaleIdentifier('vi_VN');
 
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
+      final placemarks = await placemarkFromCoordinates(lat, lon);
 
-        // subAdministrativeArea = Thành Phố ,administrativeArea = Quốc Gia
+      if (placemarks.isNotEmpty) {
+        final place = placemarks[0];
         return "${place.subAdministrativeArea != null && place.subAdministrativeArea!.isNotEmpty ? "${place.subAdministrativeArea}," : ""} ${place.administrativeArea}";
       }
+      return null;
+    } on SocketException {
+      return Future.error("Không có kết nối mạng");
     } catch (e) {
-      print("Lỗi $e");
+      return Future.error("Không thể lấy tên khu vực");
     }
-    return null;
   }
 }
