@@ -220,36 +220,57 @@ class _HomePageState extends State<HomePage> {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       drawer: Drawer(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // white space
-              Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top,
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue.shade100),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.cloud, size: 40, color: Colors.blue),
+              ),
+              accountName: Text(
+                isVietnamese ? "Ứng dụng Thời tiết" : "Weather App",
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-
-              ListTile(
-                leading: const Icon(Icons.language),
-                title: Text(
-                  isVietnamese ? "Ngôn Ngữ: VN" : "Language: EN",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                trailing: Switch(
-                  value: isVietnamese,
-                  activeThumbColor: Colors.blue,
-                  onChanged: (value) {
-                    setState(() {
-                      isVietnamese = value;
-                      _loadData();
-                    });
-                  },
+              accountEmail: Text(
+                isVietnamese
+                    ? "Dữ liệu lấy từ OpenWeatherMap"
+                    : "Data from OpenWeatherMap",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ],
-          ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.thermostat),
+              title: Text(isVietnamese ? "Đơn vị: °F" : "Unit: °F"),
+              trailing: Switch(
+                value: isFahrenheit,
+                onChanged: (value) {
+                  setState(() {
+                    isFahrenheit = value;
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: Text(isVietnamese ? "Ngôn ngữ: VN" : "Language: EN"),
+              trailing: Switch(
+                value: isVietnamese,
+                onChanged: (value) {
+                  setState(() {
+                    isVietnamese = value;
+                    _loadData();
+                  });
+                },
+              ),
+            ),
+          ],
         ),
       ),
       appBar: AppBar(
@@ -372,15 +393,28 @@ class _HomePageState extends State<HomePage> {
 
                   // temperature
                   Center(
-                    child: Text(
-                      weatherModel.temperature != null
-                          ? "${weatherModel.temperature}°C"
-                          : "-- °C",
-                      style: TextStyle(
-                        color: Colors.blue.shade700,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          weatherModel.temperature != null
+                              ? "${weatherModel.temperature} "
+                              : "-- ",
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          isFahrenheit ? "°F" : "°C",
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -556,12 +590,25 @@ class _HomePageState extends State<HomePage> {
                                         iconCode: item.icon!,
                                         size: 70,
                                       ),
-                                      Text(
-                                        "${item.temperature ?? "--"} °C",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.temperature ?? "--",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          Text(
+                                            isFahrenheit ? " °F" : " °C",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
