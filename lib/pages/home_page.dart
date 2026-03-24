@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isFahrenheit = false;
+  bool isVietnamese = true;
   late Position position;
   Widget exceptionMessage = Text("");
   bool isLoading = true;
@@ -56,17 +58,20 @@ class _HomePageState extends State<HomePage> {
       currentPosition = await locationService.getDistrictName(
         position.latitude,
         position.longitude,
+        isVietnamese ? "vi_VN" : "en_US",
       );
 
       // get weather forecast
       forecast = await weatherService.getForecast(
         position.latitude,
         position.longitude,
+        isVietnamese ? "vi" : "en",
       );
 
       // get position
       WeatherModel loadWeatherModel = await weatherService.getWeatherByPosition(
         position,
+        isVietnamese ? "vi" : "en",
       );
       if (mounted) {
         if (loadWeatherModel.city == null) {
@@ -131,6 +136,7 @@ class _HomePageState extends State<HomePage> {
     try {
       WeatherModel loadWeatherModel = await weatherService.getWeatherByCity(
         city,
+        isVietnamese ? "vi" : "en",
       );
       if (mounted) {
         if (loadWeatherModel.city == null) {
@@ -148,10 +154,12 @@ class _HomePageState extends State<HomePage> {
         currentPosition = await locationService.getDistrictName(
           searchPosition.latitude,
           searchPosition.longitude,
+          isVietnamese ? "vi_VN" : "en_US",
         );
         forecast = await weatherService.getForecast(
           searchPosition.latitude,
           searchPosition.longitude,
+          isVietnamese ? "vi" : "en",
         );
       } else {
         currentPosition = null;
@@ -224,12 +232,21 @@ class _HomePageState extends State<HomePage> {
               ),
 
               ListTile(
-                leading: Icon(Icons.home),
+                leading: const Icon(Icons.language),
                 title: Text(
-                  "Home",
-                  style: TextStyle(fontWeight: FontWeight.w500),
+                  isVietnamese ? "Ngôn Ngữ: VN" : "Language: EN",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                onTap: () {},
+                trailing: Switch(
+                  value: isVietnamese,
+                  activeThumbColor: Colors.blue,
+                  onChanged: (value) {
+                    setState(() {
+                      isVietnamese = value;
+                      _loadData();
+                    });
+                  },
+                ),
               ),
             ],
           ),
@@ -248,7 +265,9 @@ class _HomePageState extends State<HomePage> {
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.blue.shade100,
-            hintText: "Nhập Tên Thành Phố Muốn Tìm",
+            hintText: isVietnamese
+                ? "Nhập Tên Thành Phố"
+                : "Enter the city name",
             hintStyle: TextStyle(color: Colors.grey.shade600),
             // prefixIcon: const Icon(Icons.search, color: Colors.blue),
             enabledBorder: OutlineInputBorder(
@@ -412,7 +431,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    "Độ Ẩm",
+                                    isVietnamese ? "Độ Ẩm" : "Humidity",
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                     ),
@@ -436,7 +455,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    "Tốc Độ Gió",
+                                    isVietnamese ? "Tốc Độ Gió" : "Wind Speed",
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                     ),
@@ -460,7 +479,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    "Cảm Thấy Như",
+                                    isVietnamese
+                                        ? "Cảm Thấy Như"
+                                        : "Feels Like",
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                     ),
@@ -478,7 +499,7 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 30, left: 20),
                     child: Text(
-                      "Dự báo thời tiết",
+                      isVietnamese ? "Dự báo thời tiết" : "Weather Forecast",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,

@@ -7,15 +7,15 @@ import 'package:weather_app/models/weather_model.dart';
 class WeatherService {
   final String apiKey = "d31d897e26cda6c950d80fc7af5c9a62";
 
-  Future<WeatherModel> getWeatherByCity(String city) async {
+  Future<WeatherModel> getWeatherByCity(String city, String language) async {
     try {
       final String url =
-          "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric&lang=vi";
+          "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric&lang=$language";
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        return WeatherModel.fromJson(json);
+        return WeatherModel.fromJson(json, language == "vi" ? true : false);
       }
     } on SocketException {
       throw SocketException("Không có kết nối mạng");
@@ -35,15 +35,18 @@ class WeatherService {
     );
   }
 
-  Future<WeatherModel> getWeatherByPosition(Position position) async {
+  Future<WeatherModel> getWeatherByPosition(
+    Position position,
+    String language,
+  ) async {
     try {
       final String url =
-          "https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric&lang=vi";
+          "https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric&lang=$language";
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        return WeatherModel.fromJson(json);
+        return WeatherModel.fromJson(json, language == "vi" ? true : false);
       }
     } on SocketException {
       throw SocketException("Không có kết nối mạng");
@@ -99,10 +102,14 @@ class WeatherService {
   }
 
   // weather forecast
-  Future<List<WeatherModel>> getForecast(double lat, double lon) async {
+  Future<List<WeatherModel>> getForecast(
+    double lat,
+    double lon,
+    String language,
+  ) async {
     try {
       final url =
-          "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=vi";
+          "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=$language";
 
       final response = await http.get(Uri.parse(url));
 
@@ -116,6 +123,7 @@ class WeatherService {
             .map(
               (e) => WeatherModel.fromJson(
                 e,
+                language == "vi" ? true : false,
                 isForecast: true,
                 timezone: timezone,
               ),

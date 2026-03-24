@@ -37,8 +37,8 @@ class LocationService {
     }
   }
 
-  Future<String?> getDistrictName(double lat, double lon) async {
-    await setLocaleIdentifier('vi_VN');
+  Future<String?> getDistrictName(double lat, double lon, String locale) async {
+    await setLocaleIdentifier(locale);
 
     try {
       final placemarks = await placemarkFromCoordinates(lat, lon);

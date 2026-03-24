@@ -25,7 +25,8 @@ class WeatherModel {
 
   // convert json
   factory WeatherModel.fromJson(
-    Map<String, dynamic> json, {
+    Map<String, dynamic> json,
+    bool isVietnamese, {
     bool isForecast = false,
     int timezone = 0,
   }) {
@@ -38,7 +39,7 @@ class WeatherModel {
 
     String formattedDate = DateFormat(
       isForecast ? 'HH:mm, d/M, yyyy' : 'EEEE, d MMMM, yyyy',
-      'vi_VN',
+      isVietnamese ? 'vi_VN' : 'en_US',
     ).format(cityTime);
 
     return WeatherModel(
