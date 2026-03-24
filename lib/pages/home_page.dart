@@ -86,12 +86,12 @@ class _HomePageState extends State<HomePage> {
       });
     } on SocketException catch (e) {
       setState(() {
-        exceptionMessage = handlingException(2, text: "$e");
+        exceptionMessage = handlingException(2, text: e.message);
       });
       return;
     } on HttpException catch (e) {
       setState(() {
-        exceptionMessage = handlingException(2, text: "$e");
+        exceptionMessage = handlingException(2, text: e.message);
       });
       return;
     } catch (e) {
