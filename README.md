@@ -1,16 +1,7 @@
-# weather_app
+# 🌤️ NeoWeather Mobile App
+Welcome to NeoWeather app! Create by [Nhan Nguyen](https://github.com/nhan-ng05) in 2026. NeoWeather is a mobile platform app staying update with the latest weather conditions for any location,A modern weather forecasting application built with **Flutter**, focusing on clean architecture, and a smooth user experience
 
-A new Flutter project.
+## User Interface
+<!-- ![Home Screen](assets/home.png) -->
 
 ## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
