@@ -3,7 +3,7 @@ name: Flutter Release CI/CD
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:  
 
 permissions:
