@@ -3,12 +3,12 @@ import 'package:intl/intl.dart';
 class WeatherModel {
   final String? city;
   final String? country;
-  final String? temperature;
+  final double? temperature;
   final String? humidity;
   final String? description;
   final String? windSpeed;
   final String? icon;
-  final String? feelsLike;
+  final double? feelsLike;
   final String? dateTime;
 
   WeatherModel({
@@ -45,12 +45,12 @@ class WeatherModel {
     return WeatherModel(
       city: isForecast ? null : json["name"],
       country: isForecast ? null : json["sys"]?["country"],
-      temperature: json["main"]["temp"].toDouble().round().toString(),
+      temperature: json["main"]["temp"].toDouble(),
       description: json["weather"][0]["description"],
       humidity: json["main"]["humidity"].toString(),
       windSpeed: json["wind"]["speed"].toString(),
       icon: json["weather"][0]["icon"],
-      feelsLike: json["main"]["feels_like"]?.toDouble().round().toString(),
+      feelsLike: json["main"]["feels_like"].toDouble(),
       dateTime: formattedDate,
     );
   }

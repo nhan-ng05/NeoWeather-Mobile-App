@@ -42,6 +42,13 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
 
+  double convertTemp(double celsius, bool isFahrenheit) {
+    if (isFahrenheit) {
+      return double.parse(((celsius * 9 / 5) + 32).toStringAsFixed(1));
+    }
+    return double.parse(celsius.toStringAsFixed(1));
+  }
+
   Future<void> _loadData() async {
     // trigger animation
     setState(() {
@@ -398,7 +405,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           weatherModel.temperature != null
-                              ? "${weatherModel.temperature} "
+                              ? "${convertTemp(weatherModel.temperature!, isFahrenheit)} "
                               : "-- ",
                           style: TextStyle(
                             color: Colors.blue.shade700,
@@ -506,11 +513,24 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Icon(WeatherIcons.thermometer, size: 25),
                                   const SizedBox(height: 6),
-                                  Text(
-                                    "${weatherModel.feelsLike ?? "--"} °C",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        weatherModel.feelsLike != null
+                                            ? "${convertTemp(weatherModel.feelsLike!, isFahrenheit)} "
+                                            : "-- ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        isFahrenheit ? "°F" : "°C",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Text(
                                     isVietnamese
@@ -595,7 +615,9 @@ class _HomePageState extends State<HomePage> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            item.temperature ?? "--",
+                                            item.temperature == null
+                                                ? "--"
+                                                : "${convertTemp(item.temperature!, isFahrenheit)}",
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
