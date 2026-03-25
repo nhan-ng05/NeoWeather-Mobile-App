@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isFahrenheit = false;
   bool isVietnamese = true;
-  late Position position;
+  late Position? position;
   Widget exceptionMessage = Text("");
   bool isLoading = true;
   final LocationService locationService = LocationService();
@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
     return double.parse(celsius.toStringAsFixed(1));
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadData({String city = ""}) async {
     // trigger animation
     setState(() {
       isLoading = true;
@@ -58,26 +58,30 @@ class _HomePageState extends State<HomePage> {
 
     try {
       // get position
-      position = await locationService.getCurrentLocation();
+      if (city != "") {
+        position = await weatherService.getPositionByCity(city);
+      } else {
+        position = await locationService.getCurrentLocation();
+      }
       await initializeDateFormatting('vi_VN', null);
 
       // get administration && ministration
       currentPosition = await locationService.getDistrictName(
-        position.latitude,
-        position.longitude,
+        position!.latitude,
+        position!.longitude,
         isVietnamese ? "vi_VN" : "en_US",
       );
 
       // get weather forecast
       forecast = await weatherService.getForecast(
-        position.latitude,
-        position.longitude,
+        position!.latitude,
+        position!.longitude,
         isVietnamese ? "vi" : "en",
       );
 
       // get position
       WeatherModel loadWeatherModel = await weatherService.getWeatherByPosition(
-        position,
+        position!,
         isVietnamese ? "vi" : "en",
       );
       if (mounted) {
@@ -272,7 +276,9 @@ class _HomePageState extends State<HomePage> {
                 onChanged: (value) {
                   setState(() {
                     isVietnamese = value;
-                    _loadData();
+
+                    // keep current Position when user search
+                    _loadData(city: searchController.text);
                   });
                 },
               ),
@@ -587,7 +593,7 @@ class _HomePageState extends State<HomePage> {
                                 final WeatherModel item = forecast[index];
 
                                 return Container(
-                                  width: 140,
+                                  width: 180,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),
@@ -639,6 +645,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                     ),
                   ),
+
+                  // spacing
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
