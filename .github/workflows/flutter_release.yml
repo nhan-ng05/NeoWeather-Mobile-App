@@ -1,0 +1,57 @@
+name: Flutter Release CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Lấy code
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Cài Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+
+      # Cài dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Build APK release
+      - name: Build APK
+        run: flutter build apk --release
+
+      # Đổi tên file APK
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/neoweather.apk
+
+      # Tạo GitHub Release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "NeoWeather.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+
+      # Upload APK vào Release
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/neoweather.apk
+          asset_name: neoweather.apk
+          asset_content_type: application/vnd.android.package-archive
