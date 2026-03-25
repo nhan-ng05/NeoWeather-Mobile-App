@@ -26,7 +26,7 @@ jobs:
 
       # Đổi tên file APK
       - name: Rename APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/weather_app_v1.0.apk
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/neoweather.apk
 
       # Upload artifact với tên mới
       - name: Upload APK
