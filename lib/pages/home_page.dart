@@ -363,7 +363,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  // Datetime
+                  // datetime
                   Center(
                     child: Text(
                       weatherModel.dateTime ?? "Không Có Thông Tin Thời Gian",
