@@ -4,7 +4,7 @@ You can download the app[here](https://github.com/nhan-ng05/NeoWeather-Mobile-Ap
 
 ## Video Demo - Capture on Samsung Galaxy S10
 
-![Demo GIF](assets/demo.gif)
+<img src="assets/demo.gif" width="300">
 
 ## Features
 
