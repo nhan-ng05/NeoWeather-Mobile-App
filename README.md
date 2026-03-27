@@ -3,10 +3,8 @@ Welcome to NeoWeather app! Create by [Nhan Nguyen](https://github.com/nhan-ng05)
 You can download the app[here](https://github.com/nhan-ng05/NeoWeather-Mobile-App/releases).
 
 ## Video Demo - Capture on Samsung Galaxy S10
-<video width="640" height="360" controls>
-    <source src="assets/demo.mp4" type="video/mp4">
-    Video Demo
-<video>
+
+![Demo GIF](assets/demo.gif)
 
 ## Features
 
@@ -28,4 +26,4 @@ NeoWeather fetches data from the OpenWeatherMap API, which provides comprehensiv
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](../LICENSE) for more information.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
